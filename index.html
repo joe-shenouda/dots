@@ -1,0 +1,432 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voronoi Stippling Art Generator</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #ffcc33, #ff66cc);
+      color: #333;
+    }
+    header {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 3em;
+      color: #ff0066;
+      text-shadow: 2px 2px #fff;
+    }
+    main {
+      padding: 20px;
+      max-width: 800px; 
+      margin: 0 auto;
+      text-align: center;
+    }
+    #description {
+      margin-bottom: 30px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+    }
+    #description h2 {
+      color: #ff0066;
+      margin-top: 0;
+    }
+    #description p {
+      font-size: 1.2em;
+      line-height: 1.5;
+    }
+    #controls {
+      margin-bottom: 20px;
+    }
+    #controls input[type="file"] {
+      display: none;
+    }
+    #upload-label {
+      background-color: #ff0066;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    #controls button {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin-left: 10px;
+      cursor: pointer;
+      border: none;
+      background-color: #ff0066;
+      color: #fff;
+      border-radius: 5px;
+    }
+    #controls button:hover {
+      background-color: #e6005c;
+    }
+    #parameters {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .parameter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .parameter label {
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #ff0066;
+    }
+    .parameter input {
+      width: 100px;
+      padding: 5px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      max-width: 800px; 
+      height: auto;
+      margin: 20px auto;
+      border: 2px solid #ff0066;
+      border-radius: 10px;
+    }
+    #progress {
+      margin-top: 10px;
+      font-size: 1.2em;
+      color: #333;
+    }
+    #progress-bar-container {
+      margin-top: 10px;
+      width: 100%;
+    }
+    #progress-bar {
+      width: 100%;
+      height: 20px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    progress[value]::-webkit-progress-bar {
+      background-color: #f3f3f3;
+      border-radius: 10px;
+    }
+    progress[value]::-webkit-progress-value {
+      background-color: #ff0066;
+      border-radius: 10px;
+    }
+    progress[value]::-moz-progress-bar {
+      background-color: #ff0066;
+      border-radius: 10px;
+    }
+    #download-link {
+      display: none;
+      margin-top: 20px;
+    }
+    #download-link a {
+      color: #ff0066;
+      font-size: 1.2em;
+      text-decoration: none;
+    }
+    #download-link a:hover {
+      text-decoration: underline;
+    }
+
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 10px #ff66cc;
+      }
+      to {
+        box-shadow: 0 0 20px #ff0066;
+      }
+    }
+    header h1 {
+      animation: glow 1s infinite alternate;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Voronoi Stippling Art Generator</h1>
+  </header>
+  <main>
+    <section id="description">
+      <h2>Transform Your Photos into Dot Art!</h2>
+      <p>
+        Turn your pictures into amazing dot artwork. This tool places dots based on how light or dark each part of your image is, creating a beautiful, artistic version of your original picture. You can upload your own image or use the example one provided. Click "Start Processing" to see the magic happen!
+      </p>
+      <p>This technique is based on Weighted Voronoi Stippling by Adrian Secord.</p>
+      <p>Implemented by Joe Shenouda using D3 Observable Framework, an open-source static site generator for data apps, dashboards, reports, and more.</p>
+    </section>
+    <div id="controls">
+      <label id="upload-label">
+        Choose Image
+        <input type="file" id="upload" accept="image/*">
+      </label>
+      <button id="start-button">Start Processing</button>
+    </div>
+    <div id="parameters">
+      <div class="parameter">
+        <label for="points-density">Points Density</label>
+        <input type="number" id="points-density" value="40" min="10" max="200">
+      </div>
+      <div class="parameter">
+        <label for="iterations">Iterations</label>
+        <input type="number" id="iterations" value="30" min="10" max="200">
+      </div>
+      <div class="parameter">
+        <label for="point-size">Point Size</label>
+        <input type="number" id="point-size" value="1.5" step="0.1" min="0.5" max="5">
+      </div>
+    </div>
+    <div id="progress"></div>
+    <div id="progress-bar-container">
+      <progress id="progress-bar" value="0" max="100"></progress>
+    </div>
+    <canvas id="canvas"></canvas>
+    <div id="download-link">
+      <a href="#" id="download-image" download="stippling.png">Download Image</a>
+    </div>
+  </main>
+
+  <script src="https://d3js.org/d3-delaunay.v6.min.js"></script>
+  <script>
+    const defaultImageUrl = '/a/63a9ba4d-b809-4cdc-ab25-d7f515f601f1'; 
+    const uploadInput = document.getElementById('upload');
+    const uploadLabel = document.getElementById('upload-label');
+    const startButton = document.getElementById('start-button');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const progress = document.getElementById('progress');
+    const progressBar = document.getElementById('progress-bar');
+    const downloadLink = document.getElementById('download-link');
+    const downloadImage = document.getElementById('download-image');
+
+    let imageFile;
+    let width, height;
+    let imageLoaded = false;
+
+    window.addEventListener('load', () => {
+      const img = new Image();
+      img.onload = function() {
+        const maxWidth = 800;
+        const maxHeight = 600;
+
+        let imgWidth = img.width;
+        let imgHeight = img.height;
+
+        const widthRatio = maxWidth / imgWidth;
+        const heightRatio = maxHeight / imgHeight;
+        const ratio = Math.min(widthRatio, heightRatio, 1);
+
+        width = imgWidth * ratio;
+        height = imgHeight * ratio;
+
+        canvas.width = width;
+        canvas.height = height;
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(img, 0, 0, width, height);
+        progress.textContent = 'Example image loaded. Click "Start Processing" to begin.';
+        imageLoaded = true;
+
+        canvas.style.display = 'block';
+      };
+      img.onerror = function() {
+        progress.textContent = 'Failed to load example image.';
+      };
+      img.src = "https://www.cyber-consult.org/labs/dots/test.jpg";
+    });
+
+    startButton.addEventListener('click', handleStartProcessing);
+    uploadInput.addEventListener('change', handleImageUpload);
+
+    function handleImageUpload(event) {
+      imageFile = event.target.files[0];
+      if (imageFile) {
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          img.onload = function() {
+            width = img.width;
+            height = img.height;
+            canvas.width = width;
+            canvas.height = height;
+            context.clearRect(0, 0, canvas.width, canvas.height); 
+            context.drawImage(img, 0, 0);
+            progress.textContent = 'Image loaded. Ready to start.';
+            imageLoaded = true; 
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(imageFile);
+        uploadLabel.childNodes[0].nodeValue = 'Change Image';
+      } else {
+        progress.textContent = 'No image selected.';
+      }
+    }
+
+    function handleStartProcessing() {
+      if (!imageLoaded) {
+        const img = new Image();
+        img.onload = function() {
+          width = img.width;
+          height = img.height;
+          canvas.width = width;
+          canvas.height = height;
+          context.clearRect(0, 0, canvas.width, canvas.height); 
+          context.drawImage(img, 0, 0);
+          imageLoaded = true; 
+          startProcessing();
+        };
+        img.onerror = function() {
+          progress.textContent = 'Failed to load example image.';
+        };
+        img.src = defaultImageUrl;
+      } else {
+        startProcessing();
+      }
+    }
+
+    function startProcessing() {
+      const pointsDensity = parseInt(document.getElementById('points-density').value) || 40;
+      const iterations = parseInt(document.getElementById('iterations').value) || 30;
+      const pointSize = parseFloat(document.getElementById('point-size').value) || 1.5;
+
+      setTimeout(() => {
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const data = new Float64Array(canvas.width * canvas.height);
+        for (let i = 0; i < data.length; i++) {
+          const r = imageData.data[i * 4];
+          data[i] = Math.max(0, 1 - r / 254);
+        }
+
+        performVoronoiStippling(data, canvas.width, canvas.height, pointsDensity, iterations, pointSize);
+        progress.textContent = 'Processing... Please wait.';
+        progressBar.value = 0;
+        downloadLink.style.display = 'none';
+      }, 0);
+    }
+
+    function performVoronoiStippling(data, width, height, pointsDensity, iterations, pointSize) {
+      const n = Math.round(width * height / pointsDensity);
+      const worker = new Worker(createWorkerURL(iterations));
+
+      worker.onmessage = function(event) {
+        const msg = event.data;
+        const points = msg.points;
+
+        if (points) {
+          context.fillStyle = '#fff';
+          context.fillRect(0, 0, width, height);
+          context.beginPath();
+          for (let i = 0; i < points.length; i += 2) {
+            const x = points[i];
+            const y = points[i + 1];
+            context.moveTo(x + pointSize, y);
+            context.arc(x, y, pointSize, 0, 2 * Math.PI);
+          }
+          context.fillStyle = '#000';
+          context.fill();
+
+          if (msg.done) {
+            progress.textContent = 'Processing completed.';
+            progressBar.value = 100;
+            worker.terminate();
+            prepareDownload();
+          } else {
+            const percentComplete = Math.round(((msg.iteration + 1) / iterations) * 100);
+            progress.textContent = 'Processing... Iteration ' + (msg.iteration + 1) + ' of ' + iterations;
+            progressBar.value = percentComplete;
+          }
+        }
+      };
+
+      worker.onerror = function(error) {
+        progress.textContent = 'Error during processing.';
+        console.error(error);
+        worker.terminate();
+      };
+
+      worker.postMessage({ data: data, width: width, height: height, n: n });
+    }
+
+    function createWorkerURL(iterations) {
+      const blobCode = `
+        self.importScripts('https://d3js.org/d3-delaunay.v6.min.js');
+        self.onmessage = function(event) {
+          const { data, width, height, n } = event.data;
+          let points = new Float64Array(n * 2);
+          const c = new Float64Array(n * 2);
+          const s = new Float64Array(n);
+
+          for (let i = 0; i < n; ++i) {
+            for (let j = 0; j < 30; ++j) {
+              const x = points[i * 2] = Math.floor(Math.random() * width);
+              const y = points[i * 2 + 1] = Math.floor(Math.random() * height);
+              if (Math.random() < data[y * width + x]) break;
+            }
+          }
+
+          let delaunay = new d3.Delaunay(points);
+
+          for (let k = 0; k < ${iterations}; ++k) {
+            c.fill(0);
+            s.fill(0);
+
+            let i;
+            for (let y = 0; y < height; ++y) {
+              for (let x = 0; x < width; ++x) {
+                const w = data[y * width + x];
+                i = delaunay.find(x + 0.5, y + 0.5);
+                s[i] += w;
+                c[i * 2] += w * (x + 0.5);
+                c[i * 2 + 1] += w * (y + 0.5);
+              }
+            }
+
+            const w = Math.pow(k + 1, -0.8) * 10;
+            for (let i = 0; i < n; ++i) {
+              const x0 = points[i * 2];
+              const y0 = points[i * 2 + 1];
+              const x1 = s[i] ? c[i * 2] / s[i] : x0;
+              const y1 = s[i] ? c[i * 2 + 1] / s[i] : y0;
+              points[i * 2] = x0 + (x1 - x0) * 1.8 + (Math.random() - 0.5) * w;
+              points[i * 2 + 1] = y0 + (y1 - y0) * 1.8 + (Math.random() - 0.5) * w;
+            }
+
+            delaunay = new d3.Delaunay(points);
+
+            self.postMessage({ points: points, iteration: k });
+          }
+
+          self.postMessage({ points: points, done: true });
+          self.close();
+        };
+      `;
+
+      const blob = new Blob([blobCode], { type: 'application/javascript' });
+      return URL.createObjectURL(blob);
+    }
+
+    function prepareDownload() {
+      canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        downloadImage.href = url;
+        downloadLink.style.display = 'block';
+      });
+    }
+  </script>
+</body>
+</html>
