@@ -202,7 +202,7 @@
 
   <script src="https://d3js.org/d3-delaunay.v6.min.js"></script>
   <script>
-    const defaultImageUrl = "https://private-user-images.githubusercontent.com/24913656/368717684-9ea61ffb-ef4f-47b5-9fff-b717a524aaed.jpg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjY2ODkzODUsIm5iZiI6MTcyNjY4OTA4NSwicGF0aCI6Ii8yNDkxMzY1Ni8zNjg3MTc2ODQtOWVhNjFmZmItZWY0Zi00N2I1LTlmZmYtYjcxN2E1MjRhYWVkLmpwZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDA5MTglMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQwOTE4VDE5NTEyNVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTA4ZDNhY2E2ODI5ZmZmZjkyOGNiN2JhOTVmZmJiYTA2ODNiMzdmNWY5MzUwYzdjZmJjN2YzZDhjYWM2ZWQ1YjImWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.K0Qkkx9ev9PUtv4-ZkVwrfZ66oGvi7A63kkHOPlZvKU"; 
+    const defaultImageUrl = '/a/63a9ba4d-b809-4cdc-ab25-d7f515f601f1'; 
     const uploadInput = document.getElementById('upload');
     const uploadLabel = document.getElementById('upload-label');
     const startButton = document.getElementById('start-button');
@@ -246,7 +246,7 @@
       img.onerror = function() {
         progress.textContent = 'Failed to load example image.';
       };
-      img.src = "https://www.cyber-consult.org/labs/dots/test.jpg";
+      img.src = "https://private-user-images.githubusercontent.com/24913656/368717684-9ea61ffb-ef4f-47b5-9fff-b717a524aaed.jpg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjY2ODk1NTAsIm5iZiI6MTcyNjY4OTI1MCwicGF0aCI6Ii8yNDkxMzY1Ni8zNjg3MTc2ODQtOWVhNjFmZmItZWY0Zi00N2I1LTlmZmYtYjcxN2E1MjRhYWVkLmpwZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDA5MTglMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQwOTE4VDE5NTQxMFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTk0OTgwMzRkNjU0NjA4YjRkZTUyOTI0MzZlMzgxMDY0MjYyNWQ2MDlkNjE3ODI5Yzk5ZTlmMzFjNzkyMjc0NGEmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.Rm29lMby-RXcCWEvkDlTAqXVpohsHcB9wzkyYRz8JP0";
     });
 
     startButton.addEventListener('click', handleStartProcessing);
